@@ -164,7 +164,7 @@
                             {
                                 columnWidth: 0.5,
                                 margin: '0 15',
-                                bodyPadding: '80 0 0 0',
+                                bodyPadding: '70 0 0 0',
                                 height: 315,
                                 html: new Ext.XTemplate(
                                     '<p class="center"><a target="_blank" href="{repo}"><img src="{src}" /></a></p>',
@@ -201,22 +201,24 @@
             });
 
             // 数据指标
-            tool.ajax('GET', '/api/home/metric', {}, function (rsp) {
-                if (rsp.success !== true) {
-                    return false;
-                }
+            newTask(60000, function () {
+                tool.ajax('GET', '/api/home/metric', {}, function (rsp) {
+                    if (rsp.success !== true) {
+                        return false;
+                    }
 
-                Ext.each(Ext.query('[class=metric-value]'), function (dom) {
-                    var value = 0;
-                    var total = rsp.data[dom.dataset.key];
-                    var step = Math.ceil(total / 20);
-                    var task = newTask(30, function () {
-                        if ((value += step) >= total) {
-                            task.stop();
-                            value = total;
-                        }
-                        dom.innerHTML = value;
-                    })
+                    Ext.each(Ext.query('[class=metric-value]'), function (dom) {
+                        var value = 0;
+                        var total = rsp.data[dom.dataset.key];
+                        var step = Math.ceil(total / 20);
+                        var task = newTask(30, function () {
+                            if ((value += step) >= total) {
+                                task.stop();
+                                value = total;
+                            }
+                            dom.innerHTML = value;
+                        })
+                    });
                 });
             });
 
@@ -280,7 +282,7 @@
                 };
             });
 
-            chart.source([
+            chart.data([
                 {name: '可用', value: 0, percent: 0},
                 {name: '已用', value: 0, percent: 0},
             ]);
